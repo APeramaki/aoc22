@@ -1,7 +1,5 @@
 use std::io::{BufRead, BufReader};
 use std::fs::File;
-use std::iter::Enumerate;
-
 
 fn main() {
     let f = match File::open("input.txt") {
@@ -20,22 +18,20 @@ fn main() {
         match reader.read_line(&mut line) {
             Ok(0) => {break;},
             Ok(1) => {
-                println!("Blank!");
+                // Blank!
                 break;
             },
-            Ok(_) => {
-                println!("line");
-            },
+            Ok(_) => {},
             Err(_) => {break;},
         };
 
         for (i, c) in  line.chars().enumerate() {
             if i % 4 == 1 && c.is_alphabetic() {
-                piles[ i/4 ].push(c);
+                piles[i/4].splice(..0, [c]);
             }
         }
-
     }
+
     loop {
         let mut line = String::new();
         match reader.read_line(&mut line) {
@@ -52,13 +48,18 @@ fn main() {
         
         let mut split = line.split(' ');
         split.next();
-        let amount = split.next().unwrap();
+        let amount: usize = split.next().unwrap().parse().unwrap();
         split.next();
-        let from_pile = split.next().unwrap();
+        let from_pile: usize = split.next().unwrap().parse().unwrap();
         split.next();
-        let to_pile = split.next().unwrap();
-        println!("{:?} : {:?} -> {:?}", amount, from_pile, to_pile);
+        let to_pile: usize = split.next().unwrap().parse().unwrap();
+        for _ in 0..amount {
+            let from = piles[from_pile - 1].pop().unwrap();
+            piles[to_pile - 1].push(from);
+        }
     }
-        
-    println!("{:?}", 0);
+    
+    for i in 0..9 {
+        println!("{:?}", piles[i]);
+    }
 }
